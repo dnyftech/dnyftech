@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dnyftech</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Mulish:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:      #070B12;
+      --surface: #0D1321;
+      --border:  #1A2438;
+      --cyan:    #00D4FF;
+      --muted:   #8892A4;
+      --white:   #F0F6FF;
+      --green:   #50FA7B;
+      --red:     #FF4C6A;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'Mulish', sans-serif;
+      font-weight: 300;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 48px 48px;
+      opacity: .3;
+      pointer-events: none;
+      z-index: 0;
+    }
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 5vw;
+      background: rgba(7,11,18,.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .logo { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1.5rem; letter-spacing: .06em; }
+    .logo span { color: var(--cyan); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a { font-size: .85rem; color: var(--muted); text-decoration: none; transition: color .2s; }
+    .nav-links a:hover { color: var(--cyan); }
+    .btn {
+      display: inline-block; padding: .55rem 1.4rem;
+      border: 1px solid var(--cyan); border-radius: 3px;
+      font-family: 'Rajdhani', sans-serif; font-weight: 600;
+      font-size: .95rem; letter-spacing: .08em; color: var(--cyan);
+      text-decoration: none; background: transparent;
+      transition: background .2s, color .2s; cursor: pointer;
+    }
+    .btn:hover { background: var(--cyan); color: var(--bg); }
+    .btn-solid { background: var(--cyan); color: var(--bg); }
+    .btn-solid:hover { background: transparent; color: var(--cyan); }
+    .hero {
+      position: relative; z-index: 1;
+      min-height: 100vh; display: flex; align-items: center;
+      padding: 120px 5vw 80px;
+    }
+    .hero-inner { max-width: 780px; }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: .5rem;
+      font-size: .78rem; font-weight: 500; letter-spacing: .1em;
+      color: var(--cyan); border: 1px solid #00D4FF22;
+      border-radius: 2px; padding: .3rem .8rem;
+      margin-bottom: 2rem; background: #00D4FF11;
+    }
+    .hero-tag::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--cyan); animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .3; transform: scale(.6); }
+    }
+    h1 {
+      font-family: 'Rajdhani', sans-serif; font-weight: 700;
+      font-size: clamp(3rem, 7vw, 5.5rem); line-height: 1.0;
+      margin-bottom: 1.5rem;
+    }
+    h1 em { font-style: normal; color: var(--cyan); }
+    .hero-sub { font-size: 1.1rem; color: var(--muted); max-width: 520px; margin-bottom: 2.5rem; }
+    .hero-cta { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .status-bar {
+      position: relative; z-index: 1;
+      display: flex; align-items: center; gap: 2.5rem;
+      padding: 1rem 5vw;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--surface); overflow-x: auto;
+    }
+    .stat { display: flex; flex-direction: column; min-width: 100px; }
+    .stat-val { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1.6rem; }
+    .stat-label { font-size: .75rem; color: var(--muted); letter-spacing: .05em; }
+    #api-status { margin-left: auto; font-size: .8rem; color: var(--muted); display: flex; align-items: center; gap: .4rem; }
+    #status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); transition: background .4s; }
+    #status-dot.online { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    #status-dot.offline { background: var(--red); }
+    section { position: relative; z-index: 1; padding: 80px 5vw; }
+    .eyebrow { font-size: .78rem; letter-spacing: .14em; color: var(--cyan); font-weight: 600; margin-bottom: .75rem; }
+    h2 { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: clamp(2rem, 4vw, 2.8rem); line-height: 1.1; margin-bottom: 1rem; }
+    .sub { color: var(--muted); max-width: 500px; margin-bottom: 3rem; font-size: .95rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1px; border: 1px solid var(--border); }
+    .card { background: var(--surface); padding: 2rem; border: 1px solid transparent; transition: border-color .2s; }
+    .card:hover { border-color: var(--cyan); }
+    .card-icon { width: 40px; height: 40px; border: 1px solid var(--border); border-radius: 4px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.2rem; font-size: 1.2rem; }
+    .card h3 { font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 1.15rem; letter-spacing: .04em; margin-bottom: .5rem; }
+    .card p { font-size: .88rem; color: var(--muted); }
+    .terminal { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; max-width: 680px; margin-top: 2rem; }
+    .terminal-bar { display: flex; align-items: center; gap: .5rem; padding: .7rem 1rem; background: var(--bg); border-bottom: 1px solid var(--border); }
+    .terminal-bar span { width: 10px; height: 10px; border-radius: 50%; }
+    .terminal-url { font-family: monospace; font-size: .78rem; color: var(--muted); margin-left: .5rem; }
+    .terminal-body { padding: 1.5rem; font-family: 'Courier New', monospace; font-size: .82rem; line-height: 1.8; color: var(--muted); overflow-x: auto; }
+    .m { color: #FF79C6; }
+    .u { color: var(--cyan); }
+    .c { color: #44475A; }
+    .v { color: #F1FA8C; }
+    .cta { background: var(--cyan); padding: 60px 5vw; display: flex; align-items: center; justify-content: space-between; gap: 2rem; flex-wrap: wrap; }
+    .cta h2 { color: var(--bg); margin-bottom: .4rem; }
+    .cta p { color: rgba(7,11,18,.65); max-width: 460px; }
+    .btn-dark { background: var(--bg); color: var(--cyan); border-color: var(--bg); }
+    .btn-dark:hover { background: transparent; color: var(--bg); }
+    footer { position: relative; z-index: 1; padding: 2rem 5vw; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    footer p { font-size: .8rem; color: var(--muted); }
+    @media (max-width: 640px) { .nav-links { display: none; } .cta { flex-direction: column; } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">dnyf<span>tech</span></div>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#api">API</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="btn">Get Started</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">Deployed on Cloudflare Edge</div>
+    <h1>Build Fast.<br/>Deploy <em>Globally.</em></h1>
+    <p class="hero-sub">dnyftech powers modern products with edge-first infrastructure — zero cold starts, instant deploys, global reach.</p>
+    <div class="hero-cta">
+      <a href="#api" class="btn btn-solid">Explore the API</a>
+      <a href="#services" class="btn">Our Services</a>
+    </div>
+  </div>
+</section>
+
+<div class="status-bar">
+  <div class="stat"><span class="stat-val">99.9%</span><span class="stat-label">Uptime SLA</span></div>
+  <div class="stat"><span class="stat-val">&lt;10ms</span><span class="stat-label">Edge Latency</span></div>
+  <div class="stat"><span class="stat-val">300+</span><span class="stat-label">PoPs Worldwide</span></div>
+  <div class="stat"><span class="stat-val" id="req-counter">0</span><span class="stat-label">Requests Served</span></div>
+  <div id="api-status"><span id="status-dot"></span><span id="status-text">Checking API…</span></div>
+</div>
+
+<section id="services">
+  <p class="eyebrow">What We Build</p>
+  <h2>Full-Stack, Edge-Native</h2>
+  <p class="sub">Everything your product needs, running at the edge — no cold starts, no compromise.</p>
+  <div class="grid">
+    <div class="card"><div class="card-icon">⚡</div><h3>Cloudflare Workers</h3><p>Serverless APIs that boot in microseconds, deployed to 300+ locations.</p></div>
+    <div class="card"><div class="card-icon">🌐</div><h3>Pages Hosting</h3><p>Static frontends served from the edge with built-in CI/CD.</p></div>
+    <div class="card"><div class="card-icon">🛡️</div><h3>DDoS Protection</h3><p>Always-on protection at layer 3, 4 and 7 — no config required.</p></div>
+    <div class="card"><div class="card-icon">🗄️</div><h3>KV & D1 Storage</h3><p>Persistent key-value and SQLite database at the edge.</p></div>
+  </div>
+</section>
+
+<section id="api" style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+  <p class="eyebrow">Live API</p>
+  <h2>Your Backend, Ready</h2>
+  <p class="sub">Live at <strong style="color:var(--cyan)">api.dnyftech.workers.dev</strong></p>
+  <div class="terminal">
+    <div class="terminal-bar">
+      <span style="background:#FF5F57"></span>
+      <span style="background:#FEBC2E"></span>
+      <span style="background:#28C840"></span>
+      <span class="terminal-url">api.dnyftech.workers.dev</span>
+    </div>
+    <div class="terminal-body">
+<span class="c"># Health check</span>
+<span class="m">GET</span>  <span class="u">https://api.dnyftech.workers.dev/api/health</span>
+
+<span class="c"># List users</span>
+<span class="m">GET</span>  <span class="u">https://api.dnyftech.workers.dev/api/users</span>
+
+<span class="c"># Echo payload</span>
+<span class="m">POST</span> <span class="u">https://api.dnyftech.workers.dev/api/echo</span>
+<span class="v">{ "hello": "dnyftech" }</span>
+    </div>
+  </div>
+</section>
+
+<div class="cta" id="contact">
+  <div><h2>Ready to ship?</h2><p>Bring your project — we'll get it live on the edge today.</p></div>
+  <a href="mailto:hello@dnyftech.com" class="btn btn-dark">Contact Us</a>
+</div>
+
+<footer>
+  <div class="logo" style="font-size:1.1rem;">dnyf<span style="color:var(--cyan)">tech</span></div>
+  <p>© 2026 dnyftech. Powered by Cloudflare.</p>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>
+

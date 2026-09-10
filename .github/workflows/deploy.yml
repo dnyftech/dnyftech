@@ -1,0 +1,35 @@
+name: Deploy dnyftech
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+
+  deploy-worker:
+    name: Backend -> Cloudflare Workers
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy Worker
+        run: |
+          curl -s -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/${{ secrets.CF_ACCOUNT_ID }}/workers/scripts/api" \
+            -H "Authorization: Bearer ${{ secrets.CF_API_TOKEN }}" \
+            -F "metadata={\"body_part\":\"script\",\"bindings\":[]};type=application/json" \
+            -F "script=@backend/src/worker.js;type=application/javascript"
+
+  deploy-pages:
+    name: Frontend -> Cloudflare Pages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken:    ${{ secrets.CF_API_TOKEN }}
+          accountId:   ${{ secrets.CF_ACCOUNT_ID }}
+          projectName: dnyftech
+          directory:   frontend
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
