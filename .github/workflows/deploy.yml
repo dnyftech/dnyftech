@@ -76,16 +76,18 @@ jobs:
   deploy-pages:
     name: Frontend → Cloudflare Pages
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Deploy Pages
-        uses: cloudflare/pages-action@v1
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          projectName: dnyftech
-          directory: frontend
+          command: pages deploy frontend --project-name=dnyftech
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
