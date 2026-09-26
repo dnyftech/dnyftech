@@ -25,7 +25,6 @@ jobs:
           echo "Checking Worker source..."
 
           test -f backend/src/worker.js
-
           node --check backend/src/worker.js
 
           echo "Worker source validation passed."
@@ -46,12 +45,33 @@ jobs:
 
           echo "$response"
 
-          if ! echo "$response" | grep -q '"success":true'; then
-            echo "ERROR: Cloudflare Worker deployment was not successful."
-            exit 1
-          fi
+          echo "$response" | grep -q '"success":true'
 
-          echo "DNYFTECH API Worker deployed successfully."
+          echo "Cloudflare accepted the Worker deployment."
+
+      - name: Verify Production API
+        run: |
+          set -euo pipefail
+
+          echo "Waiting for Worker propagation..."
+          sleep 5
+
+          echo "Checking production health endpoint..."
+
+          response="$(
+            curl --fail-with-body -sS \
+              --connect-timeout 10 \
+              --max-time 30 \
+              "https://api.dnyftech.workers.dev/api/health"
+          )"
+
+          echo "$response"
+
+          echo "$response" | grep -q '"success":true'
+          echo "$response" | grep -q '"status":"ok"'
+          echo "$response" | grep -q '"version":"2.0.0"'
+
+          echo "DNYFTECH API production verification passed."
 
   deploy-pages:
     name: Frontend → Cloudflare Pages
