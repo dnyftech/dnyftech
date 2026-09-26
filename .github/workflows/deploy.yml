@@ -2,34 +2,70 @@ name: Deploy dnyftech
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   workflow_dispatch:
 
-jobs:
+permissions:
+  contents: read
 
+jobs:
   deploy-worker:
-    name: Backend -> Cloudflare Workers
+    name: Backend → Cloudflare Workers
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate Worker
+        run: |
+          set -euo pipefail
+
+          echo "Checking Worker source..."
+
+          test -f backend/src/worker.js
+
+          node --check backend/src/worker.js
+
+          echo "Worker source validation passed."
+
       - name: Deploy Worker
         run: |
-          curl -s -X PUT \
-            "https://api.cloudflare.com/client/v4/accounts/${{ secrets.CF_ACCOUNT_ID }}/workers/scripts/api" \
-            -H "Authorization: Bearer ${{ secrets.CF_API_TOKEN }}" \
-            -F "metadata={\"body_part\":\"script\",\"bindings\":[]};type=application/json" \
-            -F "script=@backend/src/worker.js;type=application/javascript"
+          set -euo pipefail
+
+          echo "Deploying DNYFTECH API Worker..."
+
+          response="$(
+            curl --fail-with-body -sS -X PUT \
+              "https://api.cloudflare.com/client/v4/accounts/${{ secrets.CF_ACCOUNT_ID }}/workers/scripts/api" \
+              -H "Authorization: Bearer ${{ secrets.CF_API_TOKEN }}" \
+              -F 'metadata={"body_part":"script","bindings":[]};type=application/json' \
+              -F 'script=@backend/src/worker.js;type=application/javascript'
+          )"
+
+          echo "$response"
+
+          if ! echo "$response" | grep -q '"success":true'; then
+            echo "ERROR: Cloudflare Worker deployment was not successful."
+            exit 1
+          fi
+
+          echo "DNYFTECH API Worker deployed successfully."
 
   deploy-pages:
-    name: Frontend -> Cloudflare Pages
+    name: Frontend → Cloudflare Pages
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Deploy Pages
         uses: cloudflare/pages-action@v1
         with:
-          apiToken:    ${{ secrets.CF_API_TOKEN }}
-          accountId:   ${{ secrets.CF_ACCOUNT_ID }}
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
           projectName: dnyftech
-          directory:   frontend
+          directory: frontend
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
